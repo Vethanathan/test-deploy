@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flask WebSocket Example</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1>WebSocket Test</h1>
+    <p id="status">Connecting...</p>
+    <div id="role-info"></div>
+    <div id="messages"></div>
+
+    <div id="message-input" style="display: none">
+      <input type="text" id="message" placeholder="Enter your message" />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+      var socket = io();
+      var room = "";
+
+      socket.on("connect", function () {
+        document.getElementById("status").textContent = "Connected";
+      });
+
+      socket.on("disconnect", function () {
+        document.getElementById("status").textContent = "Disconnected";
+      });
+
+      socket.on("message", function (data) {
+        var messagesDiv = document.getElementById("messages");
+        var newMessage = document.createElement("p");
+        newMessage.textContent = data.role + ": " + data.message;
+        messagesDiv.appendChild(newMessage);
+      });
+
+      socket.on("role", function (data) {
+        var roleInfoDiv = document.getElementById("role-info");
+        roleInfoDiv.textContent = data.message;
+        room = data.room;
+        document.getElementById("message-input").style.display = "block";
+      });
+
+      function sendMessage() {
+        var messageInput = document.getElementById("message");
+        var message = messageInput.value;
+        socket.emit("message", message);
+        messageInput.value = "";
+      }
+    </script>
+  </body>
+</html>
